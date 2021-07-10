@@ -1,0 +1,13 @@
+server: irc.libera.chat:+6697
+# nickname is random-padded up to 16 chars
+# e.g. curite is turned in to curite-123456789
+# bot doesn't need to be findable
+nickname: curite
+password: curite:hunter2
+httpd-port: 8080
+
+url-success: https://example.com/v/success
+url-failure: https://example.com/v/fail
+
+# GET /account/token HTTP/1.1
+path-pattern: "^/(?P<account>[^/]+)/(?P<token>.+)$"
