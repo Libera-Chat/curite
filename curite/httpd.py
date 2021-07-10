@@ -27,8 +27,7 @@ async def _headers(
             if b"" in headers:
                 break
         else:
-            # closed connection
-            return
+            raise ConnectionError("client closed connection")
 
     return headers
 
@@ -66,6 +65,10 @@ async def run(
             async with timeout_(10):
                 headers = await _headers(reader)
         except asyncio.TimeoutError:
+            print("! header timeout")
+            return
+        except ConnectionError as e:
+            print(f"! header error {str(e)}")
             return
 
         method, path, _   = headers[0].decode("ascii").split(" ", 2)
@@ -81,6 +84,7 @@ async def run(
             async with timeout_(5):
                 verified = await _verify(bot, account, token)
         except asyncio.TimeoutError:
+            print("! verify timeout")
             return
 
         if verified:
