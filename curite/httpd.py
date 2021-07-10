@@ -73,6 +73,8 @@ async def run(
             return
 
         method, path, _   = headers[0].decode("ascii").split(" ", 2)
+        if not method == "POST":
+            return
 
         path_match = config.path_pattern.search(path)
         if not path_match:
