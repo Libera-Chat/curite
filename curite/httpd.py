@@ -1,7 +1,8 @@
 import asyncio, traceback
-from argparse  import ArgumentParser
-from asyncio   import StreamReader, StreamWriter
-from typing    import List
+from argparse     import ArgumentParser
+from asyncio      import StreamReader, StreamWriter
+from typing       import List
+from urllib.parse import unquote as url_unquote
 
 from async_timeout import timeout as timeout_
 
@@ -77,7 +78,7 @@ async def run(
         if not path_match:
             return
 
-        account = path_match.group("account")
+        account = url_unquote(path_match.group("account"))
         token   = path_match.group("token")
 
         try:
