@@ -5,11 +5,13 @@ from ircrobots import Server as BaseServer
 
 class Server(BaseServer):
     async def handshake(self):
-        nick_prefix = f"{self.params.username}-"
-        remaining   = 16-len(nick_prefix)
-        random_max  = (10**remaining)-1
-        random      = str(randint(0, random_max)).zfill(remaining)
-        self.params.nickname = f"{nick_prefix}{random}"
+        nickname = self.params.realname
+        while "#" in nickname:
+            onerand  = str(randint(0, 9))
+            nickname = nickname.replace("#", onerand, 1)
+
+        self.params.nickname = nickname
+        self.params.username = nickname
         await super().handshake()
 
     def line_preread(self, line: Line):

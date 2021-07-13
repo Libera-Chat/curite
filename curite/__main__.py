@@ -15,7 +15,7 @@ async def main(config: Config):
         host,
         port,
         tls,
-        username=config.nickname,
+        realname=config.nickname,
         password=config.password
     )
     await bot.add_server(host, params)
