@@ -1,7 +1,6 @@
 server: irc.libera.chat:+6697
-# nickname is random-padded up to 16 chars
-# e.g. curite is turned in to curite-123456789
-# bot doesn't need to be findable
+# '#' in nickname is replaced with a random digit
+# for the usecase that the bot doesn't need to be findable
 nickname: curite-#####
 password: curite:hunter2
 httpd-port: 8080
