@@ -1,0 +1,2 @@
+ircrobots ~= 0.4.6
+pyyaml    ~= 6.0
