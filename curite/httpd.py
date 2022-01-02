@@ -1,16 +1,14 @@
 import asyncio, traceback
 from argparse     import ArgumentParser
 from asyncio      import StreamReader, StreamWriter
-from typing       import List
+from typing       import cast, List
 from urllib.parse import unquote as url_unquote
 
 from async_timeout import timeout as timeout_
 
-from irctokens import build
 from ircrobots import Bot
-from ircrobots.matching   import Response, Nick, Folded, Formatless, SELF
-from ircrobots.formatting import strip as format_strip
 
+from . import CuriteServer
 from .config import Config
 
 async def _headers(
@@ -31,27 +29,6 @@ async def _headers(
             raise ConnectionError("client closed connection")
 
     return headers
-
-NICKSERV = Nick("NickServ")
-async def _verify(
-        bot:     Bot,
-        account: str,
-        token:   str) -> bool:
-
-    success = f"{account} has now been verified."
-
-    server  = list(bot.servers.values())[0]
-    async with server.read_lock:
-        await server.send(build("PRIVMSG", ["NickServ", f"VERIFY REGISTER {account} {token}"]))
-        verify_line = await server.wait_for({
-            Response("NOTICE", [SELF, Formatless(Folded(f"{account} is not awaiting verification."))], source=NICKSERV),
-            Response("NOTICE", [SELF, Formatless(Folded(f"verification failed. invalid key for {account}."))], source=NICKSERV),
-            Response("NOTICE", [SELF, Formatless(Folded(f"{account} is not registered."))], source=NICKSERV),
-            Response("NOTICE", [SELF, Formatless(Folded(success))], source=NICKSERV)
-        })
-
-        verify_msg = format_strip(verify_line.params[1])
-        return server.casefold_equals(success, verify_msg)
 
 async def run(
         bot:    Bot,
@@ -83,9 +60,13 @@ async def run(
         account = url_unquote(path_match.group("account"))
         token   = path_match.group("token")
 
+        if not bot.servers:
+            return
+        server = cast(CuriteServer, list(bot.servers.values())[0])
+
         try:
             async with timeout_(5):
-                verified = await _verify(bot, account, token)
+                verified = await server.verify(account, token)
         except asyncio.TimeoutError:
             print("! verify timeout")
             return
