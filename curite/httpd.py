@@ -15,7 +15,7 @@ from .config import Config
 
 async def _headers(
         reader: StreamReader
-        ) -> List[str]:
+        ) -> List[bytes]:
     headers: List[bytes] = []
     buffer = b""
 
