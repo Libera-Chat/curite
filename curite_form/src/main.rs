@@ -1,8 +1,7 @@
 use clap::Parser;
-use std::fs;
-use warp::Filter;
 use handlebars::Handlebars;
 use serde_json::json;
+use warp::Filter;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -17,11 +16,8 @@ async fn main() {
 
     let mut hb = Handlebars::new();
 
-    hb.register_template_string(
-        "page",
-        fs::read_to_string(args.path).expect("couldn't read template file"),
-    )
-    .expect("couldn't register template");
+    hb.register_template_file("page", args.path)
+        .expect("couldn't register template");
 
     let page = warp::path!(String / String).map(move |account, token| {
         hb.render("page", &json!({"account": account, "token": token}))
