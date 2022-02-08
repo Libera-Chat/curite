@@ -8,5 +8,6 @@ clap = { version = "3.0.14", features = ["derive"] }
 handlebars = "4.2.1"
 serde_json = "1.0.78"
 tokio = { version = "1.16.1", features = ["full"] }
+tokio-stream = { version = "0.1.8", features = ["net"] }
 warp = "0.3.2"
 
