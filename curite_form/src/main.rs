@@ -23,7 +23,7 @@ async fn main() {
 
     let page = warp::path!(String / String).map(move |account, token| {
         hb.render("page", &json!({"account": account, "token": token}))
-            .expect("couldn't format template")
+            .unwrap_or_else(|_e| String::from("couldn't format template"))
     });
 
     let listener = UnixListener::bind(opts.sock)
