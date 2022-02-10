@@ -6,16 +6,15 @@ import yaml
 
 
 @dataclass
-class Config(object):
+class Config:
     server: Tuple[str, int, bool]
     nickname: str
     password: str
     httpd_port: int
+    unix_socket_path: str
 
     url_success: str
     url_failure: str
-
-    path_pattern: Pattern
 
 
 def load(filepath: str):
@@ -33,11 +32,11 @@ def load(filepath: str):
     port = int(port_s)
 
     return Config(
-        (hostname, port, tls),
-        nickname,
-        config_yaml["password"],
-        config_yaml["httpd-port"],
-        config_yaml["url-success"],
-        config_yaml["url-failure"],
-        re_compile(config_yaml["path-pattern"]),
+        server=(hostname, port, tls),
+        nickname=nickname,
+        password=config_yaml["password"],
+        httpd_port=config_yaml.get("httpd-port", -1),
+        unix_socket_path=config_yaml.get("unix-socket-path", ""),
+        url_success=config_yaml["url-success"],
+        url_failure=config_yaml["url-failure"],
     )
