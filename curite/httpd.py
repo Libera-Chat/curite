@@ -1,7 +1,7 @@
 import asyncio, traceback
-from argparse     import ArgumentParser
-from asyncio      import StreamReader, StreamWriter
-from typing       import cast, List
+from argparse import ArgumentParser
+from asyncio import StreamReader, StreamWriter
+from typing import cast, List
 from urllib.parse import unquote as url_unquote
 
 from async_timeout import timeout as timeout_
@@ -11,9 +11,8 @@ from ircrobots import Bot
 from . import CuriteServer
 from .config import Config
 
-async def _headers(
-        reader: StreamReader
-        ) -> List[bytes]:
+
+async def _headers(reader: StreamReader) -> List[bytes]:
     headers: List[bytes] = []
     buffer = b""
 
@@ -22,7 +21,7 @@ async def _headers(
         if data:
             buffer += data
             headers.extend(buffer.split(b"\r\n"))
-            buffer  = headers.pop(-1)
+            buffer = headers.pop(-1)
             if b"" in headers:
                 break
         else:
@@ -30,14 +29,9 @@ async def _headers(
 
     return headers
 
-async def run(
-        bot:    Bot,
-        config: Config):
 
-    async def _client(
-            reader: StreamReader,
-            writer: StreamWriter
-            ):
+async def run(bot: Bot, config: Config):
+    async def _client(reader: StreamReader, writer: StreamWriter):
 
         try:
             async with timeout_(10):
@@ -49,7 +43,7 @@ async def run(
             print(f"! header error {str(e)}")
             return
 
-        method, path, _   = headers[0].decode("ascii").split(" ", 2)
+        method, path, _ = headers[0].decode("ascii").split(" ", 2)
         if not method == "POST":
             return
 
@@ -58,7 +52,7 @@ async def run(
             return
 
         account = url_unquote(path_match.group("account"))
-        token   = path_match.group("token")
+        token = path_match.group("token")
 
         if not bot.servers:
             return
@@ -76,10 +70,7 @@ async def run(
         else:
             url = config.url_failure
 
-        data = "\r\n".join([
-            "HTTP/1.1 302 Moved",
-            f"Location: {url}"
-        ]).encode("utf8")
+        data = "\r\n".join(["HTTP/1.1 302 Moved", f"Location: {url}"]).encode("utf8")
         # HTTP headers end with an empty line
         data += b"\r\n\r\n"
 

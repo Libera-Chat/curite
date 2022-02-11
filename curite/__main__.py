@@ -1,10 +1,11 @@
 import asyncio
-from argparse  import ArgumentParser
+from argparse import ArgumentParser
 from ircrobots import ConnectionParams
 
-from .       import Bot
+from . import Bot
 from .config import Config, load as config_load
-from .httpd  import run as httpd_run
+from .httpd import run as httpd_run
+
 
 async def main(config: Config):
     bot = Bot()
@@ -16,18 +17,16 @@ async def main(config: Config):
         port,
         tls,
         realname=config.nickname,
-        password=config.password
+        password=config.password,
     )
     await bot.add_server(host, params)
-    await asyncio.wait([
-        httpd_run(bot, config),
-        bot.run()
-    ])
+    await asyncio.wait([httpd_run(bot, config), bot.run()])
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("config")
-    args   = parser.parse_args()
+    args = parser.parse_args()
 
     config = config_load(args.config)
     asyncio.run(main(config))
