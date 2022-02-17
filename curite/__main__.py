@@ -25,6 +25,8 @@ async def main(config: Config):
 
     cs: CuriteServer = await bot.add_server(host, params)  # type: ignore
 
+    cs.nickserv_name = config.nickserv_name
+
     webserver = ahttpd.WebServer(cs, config)
     await webserver.listen_and_serve()
     await bot.run()

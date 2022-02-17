@@ -21,7 +21,15 @@ class WebServer:
     ) -> None:
         self.bot = bot
         self.app = web.Application()
-        self.app.add_routes([web.post("/{account}/{token}", self.on_post)])
+
+        self.app.add_routes(
+            [
+                web.post(
+                    f"/{{account:{config.account_re}}}/{{token:{config.token_re}}}",
+                    self.on_post,
+                )
+            ]
+        )
         self.config = config
 
         self.runner = web.AppRunner(self.app)

@@ -2,10 +2,11 @@ from asyncio import Future
 from random import randint
 from re import compile as re_compile
 from typing import Dict
-from irctokens import build, Line
+
 from ircrobots import Bot as BaseBot
 from ircrobots import Server as BaseServer
 from ircrobots.formatting import strip as format_strip
+from irctokens import Line, build
 
 RE_SUCCESS = re_compile(r"^(?P<account>\S+) has not been verified.$")
 RE_ALREADY = re_compile(r"^(?P<account>\S+) is not awaiting verification.$")
@@ -17,6 +18,7 @@ class CuriteServer(BaseServer):
     def __init__(self, bot: BaseBot, name: str):
         super().__init__(bot, name)
         self._waiting: Dict[str, Future[bool]] = {}
+        self.nickserv_name = "NickServ"
 
     async def handshake(self):
         nickname = self.params.realname
@@ -35,7 +37,10 @@ class CuriteServer(BaseServer):
         else:
             future = self._waiting[account] = Future()
             self.send(
-                build("PRIVMSG", ["NickServ", f"VERIFY REGISTER {account} {token}"])
+                build(
+                    "PRIVMSG",
+                    [self.nickserv_name, f"VERIFY REGISTER {account} {token}"],
+                )
             )
         return future
 
