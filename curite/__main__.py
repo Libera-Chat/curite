@@ -1,10 +1,13 @@
 import asyncio
 from argparse import ArgumentParser
+
 from ircrobots import ConnectionParams
 
-from . import Bot
-from .config import Config, load as config_load
-from .httpd import run as httpd_run
+from curite import ahttpd
+
+from . import Bot, CuriteServer
+from .config import Config
+from .config import load as config_load
 
 
 async def main(config: Config):
@@ -19,8 +22,15 @@ async def main(config: Config):
         realname=config.nickname,
         password=config.password,
     )
-    await bot.add_server(host, params)
-    await asyncio.wait([httpd_run(bot, config), bot.run()])
+
+    cs: CuriteServer = await bot.add_server(host, params)  # type: ignore
+
+    cs.nickserv_name = config.nickserv_name
+
+    webserver = ahttpd.WebServer(cs, config)
+    await webserver.listen_and_serve()
+    await bot.run()
+    await webserver.runner.cleanup()
 
 
 if __name__ == "__main__":
