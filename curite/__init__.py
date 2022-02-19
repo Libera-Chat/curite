@@ -8,7 +8,7 @@ from ircrobots import Server as BaseServer
 from ircrobots.formatting import strip as format_strip
 from irctokens import Line, build
 
-RE_SUCCESS = re_compile(r"^(?P<account>\S+) has not been verified.$")
+RE_SUCCESS = re_compile(r"^(?P<account>\S+) has now been verified.$")
 RE_ALREADY = re_compile(r"^(?P<account>\S+) is not awaiting verification.$")
 RE_INVALID = re_compile(r"^verification failed. invalid key for (?P<account>\S+).$")
 RE_ISNTREG = re_compile(r"^(?P<account>\S+) is not registered.$")
