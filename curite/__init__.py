@@ -20,16 +20,6 @@ class CuriteServer(BaseServer):
         self._waiting: Dict[str, Future[bool]] = {}
         self.nickserv_name = "NickServ"
 
-    async def handshake(self):
-        nickname = self.params.realname
-        while "#" in nickname:
-            onerand = str(randint(0, 9))
-            nickname = nickname.replace("#", onerand, 1)
-
-        self.params.nickname = nickname
-        self.params.username = nickname
-        await super().handshake()
-
     def verify(self, account: str, token: str):
         account = self.casefold(account)
         if account in self._waiting:
