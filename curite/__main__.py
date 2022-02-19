@@ -13,24 +13,12 @@ from .config import load as config_load
 async def main(config: Config):
     bot = Bot()
 
-    host, port, tls = config.server
-    params = ConnectionParams(
-        config.nickname,
-        host,
-        port,
-        tls,
-        realname=config.nickname,
-        password=config.password,
-    )
+    params = ConnectionParams.from_hoststring(config.nickname, config.server)
+    await bot.add_server("server", params)
 
-    cs: CuriteServer = await bot.add_server(host, params)  # type: ignore
-
-    cs.nickserv_name = config.nickserv_name
-
-    webserver = ahttpd.WebServer(cs, config)
-    await webserver.listen_and_serve()
+    webserver = ahttpd.WebServer(bot, config)
+    await webserver.run_noblock()
     await bot.run()
-    await webserver.runner.cleanup()
 
 
 if __name__ == "__main__":

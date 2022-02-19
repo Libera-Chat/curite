@@ -4,12 +4,10 @@ server: irc.libera.chat:+6697
 nickname: curite
 password: curite:hunter2
 nickserv-name: nickserv@services.
-httpd-port: 8080
+socket-path: /tmp/curite.sock
 
 url-success: https://example.com/v/success
 url-failure: https://example.com/v/fail
 
 # GET /account/token HTTP/1.1
-# Note that these will still appear between /s, so you cannot have eg a token of this/that/other
-account-re: "[^/]+"
-token-re: "[^/]+"
+path-pattern: "^/(?P<account>[^/]+)/(?P<token>[^/]+)$"

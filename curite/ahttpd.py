@@ -1,72 +1,69 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 
 from aiohttp import web
 from async_timeout import timeout
 
+from curite import CuriteServer
+
 if TYPE_CHECKING:
     from aiohttp.web import StreamResponse
 
-    from curite import CuriteServer
     from curite.config import Config
+
+    from ircrobots import Bot
+
+
+class VerifyError(Exception):
+    pass
 
 
 class WebServer:
     def __init__(
         self,
-        bot: CuriteServer,
+        bot: Bot,
         config: Config,
     ) -> None:
-        self.bot = bot
-        self.app = web.Application()
+        self._bot = bot
+        self._config = config
 
-        self.app.add_routes(
-            [
-                web.post(
-                    f"/{{account:{config.account_re}}}/{{token:{config.token_re}}}",
-                    self.on_post,
-                )
-            ]
-        )
-        self.config = config
+        self._app = web.Application()
+        self._app.add_routes([web.post("/{path:.*}", self._post)])
+        self._runner = web.AppRunner(self._app)
 
-        self.runner = web.AppRunner(self.app)
-
-        pass
-
-    async def listen_and_serve(self):
-        await self.runner.setup()
-        listener: web.BaseSite
-        if self.config.unix_socket_path != "":
-            listener = web.UnixSite(self.runner, self.config.unix_socket_path)
-
-        elif self.config.httpd_port > 0:
-            listener = web.TCPSite(self.runner, "localhost", self.config.httpd_port)
-
-        else:
-            raise ValueError("No configured listener location")
-
+    async def run_noblock(self):
+        await self._runner.setup()
+        print("AAAA")
+        listener = web.UnixSite(self._runner, self._config.socket_path)
         await listener.start()
 
-    async def on_post(self, request: web.Request) -> StreamResponse:
-        account = request.match_info.get("account")
-        token = request.match_info.get("token")
+    async def _verify(self, path: str) -> None:
+        match = self._config.path_pattern.search(path)
+        if match is None:
+            raise VerifyError("invalid path")
 
-        if account is None or token is None:
-            print(f"! Bad request for {account=} and {token=}")
-            raise web.HTTPBadRequest()
+        servers = list(self._bot.servers.values())
+        if not servers:
+            raise VerifyError("server unavailable")
 
+        server = cast(CuriteServer, servers[0])
+        account = match.group("account")
+        token = match.group("token")
         try:
             async with timeout(5):
-                verified = await self.bot.verify(account, token)
+                verified = await server.verify(account, token)
         except asyncio.TimeoutError:
-            raise web.HTTPInternalServerError(
-                reason="Unable to verify. Please try again later."
-            )
+            raise VerifyError("timeout")
 
-        if verified:
-            raise web.HTTPSeeOther(self.config.url_success)
+        if not verified:
+            raise VerifyError("nickserv disagrees")
 
-        raise web.HTTPSeeOther(self.config.url_failure)
+    async def _post(self, request: web.Request) -> StreamResponse:
+        try:
+            await self._verify(request.path)
+        except VerifyError:
+            raise web.HTTPSeeOther(self._config.url_failure)
+        else:
+            raise web.HTTPSeeOther(self._config.url_success)
