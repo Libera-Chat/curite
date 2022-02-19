@@ -1,7 +1,7 @@
 server: irc.libera.chat:+6697
 # '#' in nickname is replaced with a random digit
 # for the usecase that the bot doesn't need to be findable
-nickname: curite-#####
+nickname: curite
 password: curite:hunter2
 nickserv-name: nickserv@services.
 httpd-port: 8080
