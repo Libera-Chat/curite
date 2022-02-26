@@ -14,6 +14,7 @@ async def main(config: Config):
     bot = Bot()
 
     params = ConnectionParams.from_hoststring(config.nickname, config.server)
+    params.password = config.password
     await bot.add_server("server", params)
 
     webserver = ahttpd.WebServer(bot, config)
