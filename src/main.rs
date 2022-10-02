@@ -74,7 +74,7 @@ async fn main() {
                 let xmlrpc = Xmlrpc::new(config.outbound.clone());
                 let result = xmlrpc.verify(account, token).await;
 
-                warp::redirect::temporary(
+                warp::redirect::see_other(
                     match result {
                         Ok(_) => &config.verify.outcomes.success,
                         Err(_) => &config.verify.outcomes.failure,
