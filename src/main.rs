@@ -57,11 +57,12 @@ async fn main() {
 
     let get_verify = warp::get().and(warp::path!("verify" / String / String).map(
         move |account, token| {
-            hb.render(
+            let body = hb.render(
                 "get_verify",
                 &HashMap::from([("account", account), ("token", token)]),
             )
-            .unwrap_or_else(|_e| String::from("couldn't format template"))
+            .unwrap_or_else(|_e| String::from("couldn't format template"));
+            warp::reply::html(body)
         },
     ));
 
