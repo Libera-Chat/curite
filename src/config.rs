@@ -13,7 +13,7 @@ pub struct VerifyOutcomes {
 
 #[derive(Debug, Deserialize)]
 pub struct Verify {
-    pub template: String,
+    pub template: PathBuf,
     pub outcomes: VerifyOutcomes,
 }
 
