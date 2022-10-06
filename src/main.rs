@@ -9,10 +9,12 @@ use std::process::exit;
 use std::sync::Arc;
 
 use clap::Parser;
+use closure::closure;
 use handlebars::Handlebars;
 use serde_yaml::from_reader;
 use tokio::net::UnixListener;
 use tokio_stream::wrappers::UnixListenerStream;
+use warp::reply::Reply;
 use warp::Filter;
 
 use self::config::Config;
@@ -22,6 +24,51 @@ use self::xmlrpc::Xmlrpc;
 #[clap(author, version, about, long_about = None)]
 struct Opts {
     config: PathBuf,
+}
+
+struct VerifyContext<'a> {
+    config: Arc<Config>,
+    hb: Handlebars<'a>,
+}
+
+impl<'a> VerifyContext<'a> {
+    fn new(config: Arc<Config>, template: &PathBuf) -> Self {
+        let mut hb = Handlebars::new();
+        hb.register_template_file("template", template)
+            .expect("couldn't register template");
+        Self { config, hb }
+    }
+
+    fn get(context: Arc<VerifyContext>, account: String, token: String) -> impl Reply {
+        let body = context
+            .hb
+            .render(
+                "template",
+                &HashMap::from([("account", account), ("token", token)]),
+            )
+            .unwrap_or_else(|_e| String::from("couldn't format template"));
+        warp::reply::html(body)
+    }
+
+    async fn post<'b>(
+        context: Arc<VerifyContext<'b>>,
+        account: String,
+        token: String,
+    ) -> impl Reply {
+        let xmlrpc = Xmlrpc::new(context.config.outbound.clone());
+        let result = xmlrpc.verify(account, token).await;
+
+        warp::redirect::see_other(
+            match result {
+                Ok(_) => &context.config.verify.outcomes.success,
+                Err(e) => {
+                    println!("{:?}", e);
+                    &context.config.verify.outcomes.failure
+                }
+            }
+            .clone(),
+        )
+    }
 }
 
 #[tokio::main]
@@ -50,40 +97,21 @@ async fn main() {
         exit(3);
     }
 
-    let mut hb = Handlebars::new();
-
-    hb.register_template_file("get_verify", &config.verify.template)
-        .expect("couldn't register template");
-
-    let get_verify = warp::get().and(warp::path!("verify" / String / String).map(
-        move |account, token| {
-            let body = hb.render(
-                "get_verify",
-                &HashMap::from([("account", account), ("token", token)]),
-            )
-            .unwrap_or_else(|_e| String::from("couldn't format template"));
-            warp::reply::html(body)
-        },
+    let verify_context = Arc::new(VerifyContext::new(
+        Arc::clone(&config),
+        &config.verify.template,
     ));
 
-    let config_verify = config.clone();
-    let post_verify = warp::post().and(warp::path!("verify" / String / String).then(
-        move |account, token| {
-            let config = config_verify.clone();
-            async move {
-                let xmlrpc = Xmlrpc::new(config.outbound.clone());
-                let result = xmlrpc.verify(account, token).await;
+    let get_verify = warp::get()
+        // look at this god foresaken appeasement of rustc
+        .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
+        .and(warp::path!("verify" / String / String))
+        .map(VerifyContext::get);
 
-                warp::redirect::see_other(
-                    match result {
-                        Ok(_) => &config.verify.outcomes.success,
-                        Err(_) => &config.verify.outcomes.failure,
-                    }
-                    .clone(),
-                )
-            }
-        },
-    ));
+    let post_verify = warp::post()
+        .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
+        .and(warp::path!("verify" / String / String))
+        .then(VerifyContext::post);
 
     let listener = UnixListener::bind(&config.inbound).expect("failed to bind unix domain socket");
     let incoming = UnixListenerStream::new(listener);
