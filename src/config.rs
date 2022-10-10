@@ -1,4 +1,5 @@
 use http::uri::Uri;
+use regex::Regex;
 use serde::Deserialize;
 use std::path::PathBuf;
 use url::Url;
@@ -18,8 +19,17 @@ pub struct Verify {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Validation {
+    #[serde(with = "serde_regex")]
+    pub account: Regex,
+    #[serde(with = "serde_regex")]
+    pub token: Regex,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub inbound: PathBuf,
     pub outbound: Url,
     pub verify: Verify,
+    pub validation: Validation,
 }

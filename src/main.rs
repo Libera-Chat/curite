@@ -31,15 +31,29 @@ struct VerifyContext<'a> {
     hb: Handlebars<'a>,
 }
 
+enum Error {
+    BadArgument,
+}
+
 impl<'a> VerifyContext<'a> {
-    fn new(config: Arc<Config>, template: &PathBuf) -> Self {
+    fn new(config: Arc<Config>) -> Self {
         let mut hb = Handlebars::new();
-        hb.register_template_file("template", template)
+        hb.register_template_file("template", &config.verify.template)
             .expect("couldn't register template");
         Self { config, hb }
     }
 
-    fn get(context: Arc<VerifyContext>, account: String, token: String) -> impl Reply {
+    fn get(
+        context: Arc<VerifyContext>,
+        account: String,
+        token: String,
+    ) -> Result<impl Reply, Error> {
+        context
+            .config
+            .validation
+            .account
+            .find(&account)
+            .ok_or(Error::BadArgument)?;
         let body = context
             .hb
             .render(
@@ -47,7 +61,7 @@ impl<'a> VerifyContext<'a> {
                 &HashMap::from([("account", account), ("token", token)]),
             )
             .unwrap_or_else(|_e| String::from("couldn't format template"));
-        warp::reply::html(body)
+        Ok(warp::reply::html(body))
     }
 
     async fn post<'b>(
@@ -69,6 +83,10 @@ impl<'a> VerifyContext<'a> {
             .clone(),
         )
     }
+}
+
+fn display(res: Result<impl Reply, Error>) -> impl Reply {
+    res.unwrap_or_else(|_| warp::reply())
 }
 
 #[tokio::main]
@@ -97,16 +115,14 @@ async fn main() {
         exit(3);
     }
 
-    let verify_context = Arc::new(VerifyContext::new(
-        Arc::clone(&config),
-        &config.verify.template,
-    ));
+    let verify_context = Arc::new(VerifyContext::new(Arc::clone(&config)));
 
     let get_verify = warp::get()
         // look at this god foresaken appeasement of rustc
         .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
         .and(warp::path!("verify" / String / String))
-        .map(VerifyContext::get);
+        .map(VerifyContext::get)
+        .map(display);
 
     let post_verify = warp::post()
         .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
