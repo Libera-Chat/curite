@@ -1,1 +1,156 @@
-hi {{account}} wanting {{token}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="https://libera.chat/static/img/libera-color.svg">
+  <link rel="alternate icon" href="https://libera.chat/favicon.ico">
+</head>
+
+<body>
+  <main>
+    <h1>Libera Chat account verification</h1>
+
+    <form id="verification-form" method="POST"  action="/curite/verify/{{account}}/{{token}}">
+      <input type="submit" value="Verify">
+    </form>
+    <script>
+      /*
+      const form = document.getElementById('verification-form')
+
+      form.submit()
+      */
+    </script>
+
+    <p>By clicking above your Libera Chat NickServ account <code>{{account}}</code> will be verified.</p>
+    <p>If you have JS enabled you should be automatically redirected.</p>
+  </main>
+
+  <style>
+    /*! modern-normalize v1.0.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
+    *,::after,::before{box-sizing:border-box}:root{-moz-tab-size:4;tab-size:4}html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'}hr{height:0;color:inherit}abbr[title]{text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}::-moz-focus-inner{border-style:none;padding:0}:-moz-focusring{outline:1px dotted ButtonText}:-moz-ui-invalid{box-shadow:none}legend{padding:0}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}
+  </style>
+  <style>
+    @font-face {
+      /* comfortaa-regular - subset */
+      font-family: 'Comfortaa';
+      src:
+        url('https://libera.chat/static/fonts/comfortaa-v30-subset-regular.woff2') format('woff2'),
+        url('https://libera.chat/static/fonts/comfortaa-v30-subset-regular.woff') format('woff'),
+        url('https://libera.chat/static/fonts/comfortaa-v30-subset-regular.ttf') format('truetype');
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      /*             .       C       L       a      b     e       h      i     r       t     */
+      unicode-range: U+002E, U+0043, U+004C, U+0061-0062, U+0065, U+0068-0069, U+0072, U+0074;
+    }
+
+    @font-face {
+      /* ubuntu-regular - latin */
+      font-family: 'Ubuntu';
+      src:
+        local(''),
+        url('https://libera.chat/static/fonts/ubuntu-v15-latin-regular.woff2') format('woff2'),
+        url('https://libera.chat/static/fonts/ubuntu-v15-latin-regular.woff') format('woff'),
+        url('https://libera.chat/static/fonts/ubuntu-v15-latin-regular.ttf') format('truetype');
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      --header-height: 4rem;
+      --content-inline-padding: 1.3rem;
+      --content-max-width: 80ch;
+      /* define our palette for all themes */
+      --white: #fff;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --brand-purple: #5555ff;
+      --brand-pink: #ff55dd;
+      /* light-theme vars */
+      --c-bg: var(--gray-100);
+      --c-bg-secondary: var(--white);
+      --c-text: var(--gray-800);
+      --c-border: var(--gray-300);
+      --c-hl: var(--brand-pink);
+      --c-hl-secondary: var(--brand-purple);
+      --c-text-on-hl: var(--gray-800);
+      --c-text-on-hl-secondary: var(--white);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-bg: var(--gray-800);
+        --c-bg-secondary: var(--gray-900);
+        --c-text: var(--gray-200);
+        --c-border: var(--gray-400);
+      }
+    }
+
+    * {
+      color: var(--c-text);
+      box-sizing: border-box;
+      font-family: Ubuntu, sans-serif;
+      letter-spacing: .1ch;
+    }
+
+    body {
+      background-color: var(--c-bg);
+    }
+
+    h1 {
+      font-weight: 500;
+      margin-block-end: 0;
+      word-break: break-word;
+      scroll-margin-block-start: 4.5rem;
+      font-size: 2.25rem;
+    }
+
+    h1+* {
+      margin-block-start: 0;
+    }
+
+    main {
+      padding: 0 var(--content-inline-padding);
+      max-width: var(--content-max-width);
+      min-width: 0;
+      width: 100%;
+      margin: 2rem auto;
+    }
+
+    form {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+    }
+
+    input[type="submit"] {
+      border: none;
+      display: block;
+      background-color: var(--c-hl);
+      color: var(--c-text-on-hl);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+      padding: var(--content-inline-padding);
+      min-width: 25ch;
+      text-align: center;
+      margin: calc(var(--content-inline-padding) / 2) 0;
+    }
+
+    input[type="submit"]:hover {
+      background-color: var(--c-hl-secondary);
+      color: var(--c-text-on-hl-secondary);
+    }
+  </style>
