@@ -3,11 +3,11 @@ mod contexts;
 mod error;
 mod xmlrpc;
 
-use std::fs::{remove_file, File};
+use std::fs::{read_to_string, remove_file, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use clap::Parser;
 use closure::closure;
@@ -15,6 +15,7 @@ use http::response::Response;
 use http::StatusCode;
 use hyper::body::Body;
 use serde_yaml::from_reader;
+use tera::Tera;
 use tokio::net::UnixListener;
 use tokio_stream::wrappers::UnixListenerStream;
 use warp::{Filter, Reply};
@@ -38,6 +39,10 @@ fn display<T: Reply>(res: Result<T, Error>) -> Response<Body> {
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
             .into_response(),
+            Error::Lock => {
+                warp::reply::with_status("lock failure", StatusCode::INTERNAL_SERVER_ERROR)
+                    .into_response()
+            }
             Error::BadArgument(name) => {
                 warp::reply::with_status(format!("bad argument: {}", name), StatusCode::BAD_REQUEST)
                     .into_response()
@@ -72,7 +77,16 @@ async fn main() {
         exit(3);
     }
 
-    let verify_context = Arc::new(VerifyContext::new(Arc::clone(&config)));
+    let mut templates = Tera::default();
+    templates
+        .add_raw_template("verify", &read_to_string(&config.verify.template).unwrap())
+        .unwrap();
+    let templates = Arc::new(RwLock::new(templates));
+
+    let verify_context = Arc::new(VerifyContext::new(
+        Arc::clone(&config),
+        Arc::clone(&templates),
+    ));
 
     let get_verify = warp::get()
         // look at this god foresaken appeasement of rustc

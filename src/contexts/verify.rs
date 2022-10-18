@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
-use askama::Template;
+use tera::{Context, Tera};
 use warp::Reply;
 
 use crate::config::Config;
@@ -9,18 +9,12 @@ use crate::xmlrpc::Xmlrpc;
 
 pub(crate) struct VerifyContext {
     config: Arc<Config>,
-}
-
-#[derive(Template)]
-#[template(path = "verify.html")]
-struct VerifyHtml {
-    account: String,
-    token: String,
+    templates: Arc<RwLock<Tera>>,
 }
 
 impl VerifyContext {
-    pub fn new(config: Arc<Config>) -> Self {
-        Self { config }
+    pub fn new(config: Arc<Config>, templates: Arc<RwLock<Tera>>) -> Self {
+        Self { config, templates }
     }
 
     pub fn get(
@@ -28,7 +22,13 @@ impl VerifyContext {
         account: String,
         token: String,
     ) -> Result<impl Reply, Error> {
-        Ok(warp::reply::html(VerifyHtml { account, token }.render()?))
+        let mut tera_context = Context::new();
+        tera_context.insert("account", &account);
+        tera_context.insert("token", &token);
+
+        Ok(warp::reply::html(
+            context.templates.read()?.render("verify", &tera_context)?,
+        ))
     }
 
     pub async fn post(
@@ -54,10 +54,10 @@ impl VerifyContext {
 
         Ok(warp::redirect::see_other(
             match result {
-                Ok(_) => &context.config.verify.outcomes.success,
+                Ok(_) => &context.config.verify.success,
                 Err(e) => {
                     println!("{:?}", e);
-                    &context.config.verify.outcomes.failure
+                    &context.config.verify.failure
                 }
             }
             .clone(),
