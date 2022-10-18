@@ -17,6 +17,7 @@ use hyper::body::Body;
 use serde_yaml::from_reader;
 use tera::Tera;
 use tokio::net::UnixListener;
+use tokio::signal::unix::{signal, SignalKind};
 use tokio_stream::wrappers::UnixListenerStream;
 use warp::{Filter, Reply};
 
@@ -47,7 +48,22 @@ fn display<T: Reply>(res: Result<T, Error>) -> Response<Body> {
                 warp::reply::with_status(format!("bad argument: {}", name), StatusCode::BAD_REQUEST)
                     .into_response()
             }
+            Error::Std(e) => warp::reply::with_status(
+                format!("unknown error: {:?}", e),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+            .into_response(),
         },
+    }
+}
+
+async fn sighup(config: Arc<Config>, templates: Arc<RwLock<Tera>>) -> Result<(), Error> {
+    let mut stream = signal(SignalKind::hangup())?;
+    loop {
+        stream.recv().await;
+        templates
+            .write()?
+            .add_raw_template("verify", &read_to_string(&config.verify.template).unwrap())?;
     }
 }
 
@@ -103,7 +119,16 @@ async fn main() {
 
     let listener = UnixListener::bind(&config.inbound).expect("failed to bind unix domain socket");
     let incoming = UnixListenerStream::new(listener);
-    warp::serve(get_verify.or(post_verify))
-        .run_incoming(incoming)
-        .await;
+
+    tokio::try_join!(
+        async {
+            Result::<(), Error>::Ok(
+                warp::serve(get_verify.or(post_verify))
+                    .run_incoming(incoming)
+                    .await,
+            )
+        },
+        sighup(Arc::clone(&config), Arc::clone(&templates)),
+    )
+    .unwrap();
 }
