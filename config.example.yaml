@@ -2,10 +2,8 @@ inbound: /tmp/curite.sock
 outbound: http://[::1]:8086/xmlrpc
 
 verify:
-  template: templates/verify.html
-  outcomes:
-    success: https://libera.chat/registration/success
-    failure: https://libera.chat/registration/failure
+  success: https://libera.chat/registration/success
+  failure: https://libera.chat/registration/failure
 
 validation:
   account: '^[\-0-9A-Z\[\\\]^_`a-z{|}]+$'

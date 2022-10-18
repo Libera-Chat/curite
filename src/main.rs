@@ -7,7 +7,7 @@ use std::fs::{remove_file, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use clap::Parser;
 use closure::closure;
@@ -15,6 +15,7 @@ use http::response::Response;
 use http::StatusCode;
 use hyper::body::Body;
 use serde_yaml::from_reader;
+use tinytemplate::TinyTemplate;
 use tokio::net::UnixListener;
 use tokio_stream::wrappers::UnixListenerStream;
 use warp::{Filter, Reply};
@@ -38,6 +39,15 @@ fn display<T: Reply>(res: Result<T, Error>) -> Response<Body> {
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
             .into_response(),
+            Error::BadTemplate2(e) => warp::reply::with_status(
+                format!("bad template: {:?}", e),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+            .into_response(),
+            Error::Lock => {
+                warp::reply::with_status("lock failure", StatusCode::INTERNAL_SERVER_ERROR)
+                    .into_response()
+            }
             Error::BadArgument(name) => {
                 warp::reply::with_status(format!("bad argument: {}", name), StatusCode::BAD_REQUEST)
                     .into_response()
@@ -72,7 +82,12 @@ async fn main() {
         exit(3);
     }
 
-    let verify_context = Arc::new(VerifyContext::new(Arc::clone(&config)));
+    let templates = Arc::new(RwLock::new(TinyTemplate::new()));
+
+    let verify_context = Arc::new(VerifyContext::new(
+        Arc::clone(&config),
+        Arc::clone(&templates),
+    ));
 
     let get_verify = warp::get()
         // look at this god foresaken appeasement of rustc

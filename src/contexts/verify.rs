@@ -1,14 +1,17 @@
-use std::sync::Arc;
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 
 use askama::Template;
+use tinytemplate::TinyTemplate;
 use warp::Reply;
 
 use crate::config::Config;
 use crate::error::Error;
 use crate::xmlrpc::Xmlrpc;
 
-pub(crate) struct VerifyContext {
+pub(crate) struct VerifyContext<'a> {
     config: Arc<Config>,
+    templates: Arc<RwLock<TinyTemplate<'a>>>,
 }
 
 #[derive(Template)]
@@ -18,21 +21,24 @@ struct VerifyHtml {
     token: String,
 }
 
-impl VerifyContext {
-    pub fn new(config: Arc<Config>) -> Self {
-        Self { config }
+impl<'a> VerifyContext<'a> {
+    pub fn new(config: Arc<Config>, templates: Arc<RwLock<TinyTemplate<'a>>>) -> Self {
+        Self { config, templates }
     }
 
     pub fn get(
-        context: Arc<VerifyContext>,
+        context: Arc<VerifyContext<'a>>,
         account: String,
         token: String,
     ) -> Result<impl Reply, Error> {
-        Ok(warp::reply::html(VerifyHtml { account, token }.render()?))
+        Ok(warp::reply::html(context.templates.read()?.render(
+            "verify",
+            &HashMap::from([("account", account), ("token", token)]),
+        )?))
     }
 
     pub async fn post(
-        context: Arc<VerifyContext>,
+        context: Arc<VerifyContext<'a>>,
         account: String,
         token: String,
     ) -> Result<impl Reply, Error> {
@@ -54,10 +60,10 @@ impl VerifyContext {
 
         Ok(warp::redirect::see_other(
             match result {
-                Ok(_) => &context.config.verify.outcomes.success,
+                Ok(_) => &context.config.verify.success,
                 Err(e) => {
                     println!("{:?}", e);
-                    &context.config.verify.outcomes.failure
+                    &context.config.verify.failure
                 }
             }
             .clone(),
