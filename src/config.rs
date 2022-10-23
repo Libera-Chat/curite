@@ -6,7 +6,6 @@ use url::Url;
 
 #[derive(Debug, Deserialize)]
 pub struct Verify {
-    pub template: PathBuf,
     #[serde(with = "http_serde::uri")]
     pub success: Uri,
     #[serde(with = "http_serde::uri")]
@@ -27,4 +26,5 @@ pub struct Config {
     pub outbound: Url,
     pub verify: Verify,
     pub validation: Validation,
+    pub templates: String,
 }

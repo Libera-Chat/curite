@@ -27,7 +27,10 @@ impl VerifyContext {
         tera_context.insert("token", &token);
 
         Ok(warp::reply::html(
-            context.templates.read()?.render("verify", &tera_context)?,
+            context
+                .templates
+                .read()?
+                .render("verify.html", &tera_context)?,
         ))
     }
 

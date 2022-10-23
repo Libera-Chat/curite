@@ -3,7 +3,7 @@ mod contexts;
 mod error;
 mod xmlrpc;
 
-use std::fs::{read_to_string, remove_file, File};
+use std::fs::{remove_file, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::exit;
@@ -57,13 +57,11 @@ fn display<T: Reply>(res: Result<T, Error>) -> Response<Body> {
     }
 }
 
-async fn sighup(config: Arc<Config>, templates: Arc<RwLock<Tera>>) -> Result<(), Error> {
+async fn sighup(templates: Arc<RwLock<Tera>>) -> Result<(), Error> {
     let mut stream = signal(SignalKind::hangup())?;
     loop {
         stream.recv().await;
-        templates
-            .write()?
-            .add_raw_template("verify", &read_to_string(&config.verify.template).unwrap())?;
+        templates.write()?.full_reload()?;
     }
 }
 
@@ -93,25 +91,21 @@ async fn main() {
         exit(3);
     }
 
-    let mut templates = Tera::default();
-    templates
-        .add_raw_template("verify", &read_to_string(&config.verify.template).unwrap())
-        .unwrap();
-    let templates = Arc::new(RwLock::new(templates));
+    let templates = Arc::new(RwLock::new(Tera::new(&config.templates).unwrap()));
 
     let verify_context = Arc::new(VerifyContext::new(
         Arc::clone(&config),
         Arc::clone(&templates),
     ));
 
-    let get_verify = warp::get()
+    let verify_get = warp::get()
         // look at this god foresaken appeasement of rustc
         .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
         .and(warp::path!("verify" / String / String))
         .map(VerifyContext::get)
         .map(display);
 
-    let post_verify = warp::post()
+    let verify_post = warp::post()
         .and(warp::any().map(closure!(clone verify_context, || Arc::clone(&verify_context))))
         .and(warp::path!("verify" / String / String))
         .then(VerifyContext::post)
@@ -123,12 +117,12 @@ async fn main() {
     tokio::try_join!(
         async {
             Result::<(), Error>::Ok(
-                warp::serve(get_verify.or(post_verify))
+                warp::serve(verify_get.or(verify_post))
                     .run_incoming(incoming)
                     .await,
             )
         },
-        sighup(Arc::clone(&config), Arc::clone(&templates)),
+        sighup(Arc::clone(&templates)),
     )
     .unwrap();
 }

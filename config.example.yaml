@@ -1,8 +1,8 @@
 inbound: /tmp/curite.sock
 outbound: http://[::1]:8086/xmlrpc
+templates: templates/*.html
 
 verify:
-  template: templates/verify.html
   success: https://libera.chat/registration/success
   failure: https://libera.chat/registration/failure
 
