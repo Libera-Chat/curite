@@ -5,6 +5,7 @@ templates: templates/*.html
 verify:
   success: https://libera.chat/registration/success
   failure: https://libera.chat/registration/failure
+  target: "/curite/verify/{{account}}/{{token}}"
 
 validation:
   account: '^[\-0-9A-Z\[\\\]^_`a-z{|}]+$'

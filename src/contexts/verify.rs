@@ -25,6 +25,11 @@ impl VerifyContext {
         let mut tera_context = Context::new();
         tera_context.insert("account", &account);
         tera_context.insert("token", &token);
+        let target = context
+            .templates
+            .write()?
+            .render_str(&context.config.verify.target, &tera_context)?;
+        tera_context.insert("target", &target);
 
         Ok(warp::reply::html(
             context

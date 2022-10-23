@@ -6,6 +6,7 @@ use url::Url;
 
 #[derive(Debug, Deserialize)]
 pub struct Verify {
+    pub target: String,
     #[serde(with = "http_serde::uri")]
     pub success: Uri,
     #[serde(with = "http_serde::uri")]
