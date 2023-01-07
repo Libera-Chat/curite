@@ -116,11 +116,10 @@ async fn main() {
 
     tokio::try_join!(
         async {
-            Result::<(), Error>::Ok(
-                warp::serve(verify_get.or(verify_post))
-                    .run_incoming(incoming)
-                    .await,
-            )
+            warp::serve(verify_get.or(verify_post))
+                .run_incoming(incoming)
+                .await;
+            Result::<(), Error>::Ok(())
         },
         sighup(Arc::clone(&templates)),
     )
