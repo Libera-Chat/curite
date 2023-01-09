@@ -48,16 +48,16 @@ impl Post {
         self.config
             .validation
             .account
-            .find(&account)
+            .find(account)
             .ok_or(Error::BadArgument("account"))?;
         self.config
             .validation
             .token
-            .find(&token)
+            .find(token)
             .ok_or(Error::BadArgument("token"))?;
 
         let xmlrpc = Xmlrpc::new(self.config.xmlrpc.clone());
-        let result = xmlrpc.verify(&account, &token).await;
+        let result = xmlrpc.verify(account, token).await;
 
         Ok(Handled::Redirect(
             match result {
