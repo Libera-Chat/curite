@@ -84,7 +84,7 @@ async fn main() {
     let file = match File::open(opts.config) {
         Ok(reader) => reader,
         Err(e) => {
-            eprintln!("can't read config: {:?}", e);
+            eprintln!("can't read config: {e:?}");
             exit(1);
         }
     };
@@ -92,7 +92,7 @@ async fn main() {
     let config = match from_reader::<_, Config>(BufReader::new(file)) {
         Ok(config) => config,
         Err(e) => {
-            eprintln!("can't load config: {:?}", e);
+            eprintln!("can't load config: {e:?}");
             exit(2);
         }
     };

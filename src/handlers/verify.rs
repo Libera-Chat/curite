@@ -63,7 +63,7 @@ impl Post {
             match result {
                 Ok(_) => &self.config.verify.success,
                 Err(e) => {
-                    println!("{:?}", e);
+                    println!("{e:?}");
                     &self.config.verify.failure
                 }
             }
