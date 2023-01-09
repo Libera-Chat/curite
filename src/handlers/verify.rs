@@ -44,7 +44,7 @@ impl Post {
         Self { config }
     }
 
-    pub async fn handle(&self, account: String, token: String) -> Result<Handled, Error> {
+    pub async fn handle(&self, account: &str, token: &str) -> Result<Handled, Error> {
         self.config
             .validation
             .account
