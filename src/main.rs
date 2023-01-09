@@ -1,3 +1,12 @@
+#![deny(clippy::pedantic)]
+#![deny(clippy::dbg_macro)]
+#![deny(clippy::debug_assert_with_mut_call)]
+#![deny(clippy::equatable_if_let)]
+#![deny(clippy::if_then_some_else_none)]
+#![deny(clippy::same_name_method)]
+#![deny(clippy::try_err)]
+#![deny(clippy::undocumented_unsafe_blocks)]
+
 mod config;
 mod error;
 mod filters;
