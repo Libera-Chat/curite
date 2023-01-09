@@ -28,6 +28,6 @@ impl Xmlrpc {
             .call(request)
             .await
             .map(|_| ())
-            .map_err(|e| format!("{:?}", e))
+            .map_err(|e| format!("{e:?}"))
     }
 }

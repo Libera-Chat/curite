@@ -48,7 +48,7 @@ fn display(res: Result<Handled, Error>) -> Response<Body> {
         },
         Err(e) => match e {
             Error::BadTemplate(e) => warp::reply::with_status(
-                format!("bad template: {:?}", e),
+                format!("bad template: {e:?}"),
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
             .into_response(),
@@ -57,11 +57,11 @@ fn display(res: Result<Handled, Error>) -> Response<Body> {
                     .into_response()
             }
             Error::BadArgument(name) => {
-                warp::reply::with_status(format!("bad argument: {}", name), StatusCode::BAD_REQUEST)
+                warp::reply::with_status(format!("bad argument: {name}"), StatusCode::BAD_REQUEST)
                     .into_response()
             }
             Error::Std(e) => warp::reply::with_status(
-                format!("unknown error: {:?}", e),
+                format!("unknown error: {e:?}"),
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
             .into_response(),
