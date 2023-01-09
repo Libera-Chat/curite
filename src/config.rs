@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::path::PathBuf;
 use url::Url;
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Verify {
     pub target: String,
     #[serde(with = "http_serde::uri")]
@@ -13,7 +13,7 @@ pub struct Verify {
     pub failure: Uri,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Validation {
     #[serde(with = "serde_regex")]
     pub account: Regex,
@@ -21,10 +21,10 @@ pub struct Validation {
     pub token: Regex,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Config {
-    pub inbound: PathBuf,
-    pub outbound: Url,
+    pub listen: PathBuf,
+    pub xmlrpc: Url,
     pub verify: Verify,
     pub validation: Validation,
     pub templates: String,

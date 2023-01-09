@@ -1,7 +1,7 @@
 use std::sync::PoisonError;
 
 #[derive(Debug)]
-pub(crate) enum Error {
+pub enum Error {
     Lock,
     BadTemplate(tera::Error),
     BadArgument(&'static str),

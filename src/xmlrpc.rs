@@ -1,7 +1,7 @@
 use dxr::client::{Call, Client, ClientBuilder};
 use url::Url;
 
-pub(crate) struct Xmlrpc {
+pub struct Xmlrpc {
     client: Client,
 }
 impl Xmlrpc {
@@ -22,12 +22,8 @@ impl Xmlrpc {
         )
     }
 
-    pub async fn verify(&self, account: String, token: String) -> Result<(), String> {
-        let request = Xmlrpc::request(
-            "NickServ",
-            "VERIFY",
-            vec!["REGISTER", account.as_str(), token.as_str()],
-        );
+    pub async fn verify(&self, account: &str, token: &str) -> Result<(), String> {
+        let request = Xmlrpc::request("NickServ", "VERIFY", vec!["REGISTER", account, token]);
         self.client
             .call(request)
             .await
