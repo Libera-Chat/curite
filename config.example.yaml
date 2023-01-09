@@ -1,5 +1,5 @@
-inbound: /tmp/curite.sock
-outbound: http://[::1]:8086/xmlrpc
+listen: /tmp/curite.sock
+xmlrpc: http://[::1]:8086/xmlrpc
 templates: templates/*.html
 
 verify:
