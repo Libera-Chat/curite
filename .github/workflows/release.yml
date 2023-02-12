@@ -29,5 +29,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.ref_name }}
-          path: /tmp/${{ matrix.target }}/release
+          name: ${{ matrix.target }}
+          path: /tmp/${{ matrix.target }}/release/curite
