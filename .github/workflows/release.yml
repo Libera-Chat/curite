@@ -13,7 +13,7 @@ jobs:
           - x86_64-unknown-linux-gnu
     name: build
     runs-on: ubuntu-latest
-    container: rust:buster
+    container: rust:bookworm
     steps:
       - name: Checkout
         uses: actions/checkout@v3
