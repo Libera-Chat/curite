@@ -28,7 +28,7 @@ jobs:
           command: build
           args: --target ${{ matrix.target }} --release --target-dir /tmp
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
           path: /tmp/${{ matrix.target }}/release/curite
