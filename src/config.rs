@@ -24,6 +24,8 @@ pub struct Validation {
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
     pub listen: PathBuf,
+    /// Permissions represented in octal format.
+    pub listen_perms: Option<String>,
     pub xmlrpc: Url,
     pub verify: Verify,
     pub validation: Validation,
