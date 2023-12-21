@@ -11,6 +11,7 @@ dxr = "0.4.0"
 http = "0.2.8"
 http-serde = "1.1.2"
 hyper = "0.14.20"
+nix = { version = "0.27.1", features = ["fs"] }
 regex = "1.6.0"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_regex = "1.1.0"

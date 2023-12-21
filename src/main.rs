@@ -77,6 +77,14 @@ async fn sighup(templates: Arc<RwLock<Tera>>) -> Result<(), Error> {
     }
 }
 
+fn set_umask(mode: &str) -> nix::sys::stat::Mode {
+    let mode = u32::from_str_radix(mode, 8).expect("socket perms are not an octal integer");
+    let mask = nix::sys::stat::Mode::from_bits(mode)
+        .expect("socket perms are out of range")
+        .complement();
+    nix::sys::stat::umask(mask)
+}
+
 #[tokio::main]
 async fn main() {
     let opts = Opts::parse();
@@ -102,7 +110,9 @@ async fn main() {
         exit(3);
     }
 
+    let old_umask = config.listen_perms.as_deref().map(set_umask);
     let listener = UnixListener::bind(&config.listen).expect("failed to bind unix domain socket");
+    old_umask.map(nix::sys::stat::umask);
     let incoming = UnixListenerStream::new(listener);
 
     let templates = Arc::new(RwLock::new(Tera::new(&config.templates).unwrap()));

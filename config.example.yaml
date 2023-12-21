@@ -1,4 +1,5 @@
 listen: /tmp/curite.sock
+listen_perms: "660"
 xmlrpc: http://[::1]:8086/xmlrpc
 templates: templates/*.html
 
