@@ -2,6 +2,10 @@
 name = "curite"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/Libera-Chat/curite.git"
+homepage = "https://github.com/Libera-Chat/curite"
+description = "nickserv account verification URL bot"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
