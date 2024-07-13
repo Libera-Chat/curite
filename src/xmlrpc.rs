@@ -1,4 +1,4 @@
-use dxr::client::{Call, Client, ClientBuilder};
+use dxr_client::{Call, Client, ClientBuilder};
 use url::Url;
 
 pub struct Xmlrpc {

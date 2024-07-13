@@ -22,7 +22,6 @@ use std::sync::{Arc, RwLock};
 use clap::Parser;
 use http::response::Response;
 use http::StatusCode;
-use hyper::body::Body;
 use serde_yaml::from_reader;
 use tera::Tera;
 use tokio::net::UnixListener;
@@ -40,7 +39,7 @@ struct Opts {
     config: PathBuf,
 }
 
-fn display(res: Result<Handled, Error>) -> Response<Body> {
+fn display(res: Result<Handled, Error>) -> Response<warp::hyper::Body> {
     match res {
         Ok(res) => match res {
             Handled::Html(body) => warp::reply::html(body).into_response(),

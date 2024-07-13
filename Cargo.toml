@@ -1,6 +1,6 @@
 [package]
 name = "curite"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Libera-Chat/curite.git"
@@ -10,17 +10,18 @@ description = "nickserv account verification URL bot"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0.8", features = ["derive"] }
-dxr = "0.4.0"
-http = "0.2.8"
-http-serde = "1.1.2"
-hyper = "0.14.20"
-regex = "1.6.0"
-serde = { version = "1.0.145", features = ["derive"] }
+clap = { version = "4.5.9", features = ["derive"] }
+dxr_client = { version = "0.6.2", features = ["reqwest"] }
+http = "0.2.12" # warp is stuck on an old version
+http-serde = "1.1.3"
+hyper = "1.4.1"
+regex = "1.10.5"
+reqwest = "0.12.5"
+serde = { version = "1.0.204", features = ["derive"] }
 serde_regex = "1.1.0"
 serde_yaml = "0.9.13"
-tera = "1.17.1"
-tokio = { version = "1.21.2", features = ["full"] }
-tokio-stream = { version = "0.1.10", features = ["net"] }
-url = { version = "2.3.1", features = ["serde"] }
-warp = "0.3.3"
+tera = "1.20.0"
+tokio = { version = "1.38.0", features = ["full"] }
+tokio-stream = { version = "0.1.15", features = ["net"] }
+url = { version = "2.5.2", features = ["serde"] }
+warp = "0.3.7"
