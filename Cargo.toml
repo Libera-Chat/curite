@@ -24,4 +24,4 @@ tera = "1.20.0"
 tokio = { version = "1.38.0", features = ["full"] }
 tokio-stream = { version = "0.1.15", features = ["net"] }
 url = { version = "2.5.2", features = ["serde"] }
-warp = "0.3.7"
+warp = "0.4.0"
