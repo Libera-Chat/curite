@@ -17,16 +17,9 @@
     <form id="verification-form" method="POST"  action="{{target}}">
       <input type="submit" value="Verify">
     </form>
-    <script>
-      /*
-      const form = document.getElementById('verification-form')
-
-      form.submit()
-      */
-    </script>
+    <!--Do not have JS automatically submit the above, as some email scanners (Office 365 ATP) will run it.-->
 
     <p>By clicking above your Libera Chat NickServ account <code>{{account}}</code> will be verified.</p>
-    <p>If you have JS enabled you should be automatically redirected.</p>
   </main>
 
   <style>
