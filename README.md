@@ -12,7 +12,7 @@ The included configuration and [Tera](https://keats.github.io/tera/docs/) templa
 but they can be adapted for any IRC network using Atheme services.
 The configuration can be reloaded by sending SIGHUP to a running instance of `curite`.
 
-* `listen`: The path to the Unix socket that `curite` will listen on. `curite` expects this socket to already exist.
+* `listen`: The path to the Unix socket that `curite` will listen on.
 * `xmlrpc`: The URL of Atheme's XMLRPC endpoint.
 * `templates`: A glob indicating where to find templates for the verification page.
 * `verify`: URLs related to verification. Requires the following values:
