@@ -14,18 +14,22 @@ but they can be adapted for any IRC network using Atheme services.
 * `listen`: The path to the Unix socket that `curite` will listen on.
 * `xmlrpc`: The URL of Atheme's XMLRPC endpoint.
 * `templates`: A glob indicating where to find templates for the verification page.
+  
 * `verify`: URLs related to verification. Requires the following values:
   * `success`: The URL to redirect to upon successful verification.
   * `failure`: The URL to redirect to upon failed verification.
-  * `target`: The URL to which a user should `POST` to verify their account. The following substrings will be replaced:
-      * `{{account}}`: The account name to verify.
-      * `{{token}}`: The verification token.
+  * `target`: Provided to templates as the URL to `POST` to in order to verify one's account.
+    `curite` currently requires this URL to end with `/verify/{{account}}/{{token}}`.
 * `validation`: Regexes to validate fragments of the validation URL. Requires the following values:
   * `account`: A regex to validate account names.
   * `token`: A regex to validate the verification token.
 
 The templates can be reloaded by sending SIGHUP to a running instance of `curite`.
-Reloading the config requires a restart.
+The following variables are provided to templates:
+
+* `{{account}}`: The account name being verified.
+* `{{token}}`: The verification token.
+* `{{target}}`: The URL to `POST` to in order to verify one's account, as specified in the config.
 
 ## Security
 
