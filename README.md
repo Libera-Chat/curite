@@ -10,7 +10,6 @@ and processes them using Atheme's XMLRPC interface.
 
 The included configuration and [Tera](https://keats.github.io/tera/docs/) templates are used for Libera.Chat,
 but they can be adapted for any IRC network using Atheme services.
-The configuration can be reloaded by sending SIGHUP to a running instance of `curite`.
 
 * `listen`: The path to the Unix socket that `curite` will listen on.
 * `xmlrpc`: The URL of Atheme's XMLRPC endpoint.
@@ -24,6 +23,9 @@ The configuration can be reloaded by sending SIGHUP to a running instance of `cu
 * `validation`: Regexes to validate fragments of the validation URL. Requires the following values:
   * `account`: A regex to validate account names.
   * `token`: A regex to validate the verification token.
+
+The templates can be reloaded by sending SIGHUP to a running instance of `curite`.
+Reloading the config requires a restart.
 
 ## Security
 
