@@ -18,8 +18,8 @@ but they can be adapted for any IRC network using Atheme services.
 * `verify`: URLs related to verification. Requires the following values:
   * `success`: The URL to redirect to upon successful verification.
   * `failure`: The URL to redirect to upon failed verification.
-  * `target`: Provided to templates as the URL to `POST` to in order to verify one's account.
-    `curite` currently requires this URL to end with `/verify/{{account}}/{{token}}`.
+  * `target`: Provided to templates as the link to `POST` to in order to verify one's account.
+    `curite` currently requires this link to end with `/verify/{{account}}/{{token}}`.
 * `validation`: Regexes to validate fragments of the validation URL. Requires the following values:
   * `account`: A regex to validate account names.
   * `token`: A regex to validate the verification token.
@@ -29,7 +29,7 @@ The following variables are provided to templates:
 
 * `{{account}}`: The account name being verified.
 * `{{token}}`: The verification token.
-* `{{target}}`: The URL to `POST` to in order to verify one's account, as specified in the config.
+* `{{target}}`: The link to `POST` to in order to verify one's account, as specified in the config.
 
 ## Security
 
