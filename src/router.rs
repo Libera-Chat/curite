@@ -42,7 +42,10 @@ fn display(res: Result<Handled, Error>) -> Response {
     match res {
         Ok(res) => match res {
             Handled::Html(body) => Html(Body::from(body)).into_response(),
-            Handled::Redirect(uri) => Redirect::to(uri.path()).into_response(),
+            Handled::Redirect(uri) => {
+                let uri = uri.to_string();
+                Redirect::to(&uri).into_response()
+            }
         },
         Err(e) => match e {
             Error::BadTemplate(e) => (
