@@ -12,6 +12,9 @@ pub struct Get {
     templates: Arc<RwLock<Tera>>,
 }
 
+const ENCODE_CHARS: percent_encoding::AsciiSet =
+    percent_encoding::NON_ALPHANUMERIC.remove(b'-').remove(b'_');
+
 impl Get {
     pub fn new(config: Config, templates: Arc<RwLock<Tera>>) -> Self {
         Self { config, templates }
@@ -19,12 +22,15 @@ impl Get {
 
     pub fn handle(&self, account: &str, token: &str) -> Result<Handled, Error> {
         let mut tera_context = Context::new();
-        tera_context.insert("account", &account);
-        tera_context.insert("token", &token);
+        let account_enc = percent_encoding::utf8_percent_encode(account, &ENCODE_CHARS).to_string();
+        tera_context.insert("account", &account_enc);
+        tera_context.insert("token", token);
         let target = self
             .templates
             .write()?
             .render_str(&self.config.verify.target, &tera_context)?;
+        // We no longer want percent-encoding for the account name. Replace it with the original.
+        tera_context.insert("account", account);
         tera_context.insert("target", &target);
 
         Ok(Handled::Html(
