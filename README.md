@@ -38,3 +38,9 @@ As a result, links to its pages should not be provided directly to the user over
 
 It should be noted that Atheme's XMLRPC interface is extremely powerful and
 **must not be directly exposed to the internet**.
+
+## Feature Flags
+
+`tera/builtins`: Tera's [built-in functions](https://keats.github.io/tera/docs/#built-ins)
+are disabled by default under the assumption that they're unlikely to be needed.
+Enable this feature flag to re-enable them.
