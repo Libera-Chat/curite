@@ -67,7 +67,7 @@ impl Post {
 
         Ok(Handled::Redirect(
             match result {
-                Ok(()) => &self.config.verify.success,
+                Ok(_) => &self.config.verify.success,
                 Err(e) => {
                     println!("{e:?}");
                     &self.config.verify.failure

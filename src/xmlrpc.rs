@@ -11,12 +11,12 @@ impl Xmlrpc {
         }
     }
 
-    async fn request<'a>(
+    async fn request(
         &self,
-        service: &'static str,
-        command: &'static str,
-        params: Vec<&'a str>,
-    ) -> Result<(), ClientError> {
+        service: &str,
+        command: &str,
+        params: Vec<&str>,
+    ) -> Result<String, ClientError> {
         self.client
             .call(
                 "atheme.command",
@@ -25,9 +25,8 @@ impl Xmlrpc {
             .await
     }
 
-    pub async fn verify(&self, account: &str, token: &str) -> Result<(), String> {
+    pub async fn verify(&self, account: &str, token: &str) -> Result<String, ClientError> {
         self.request("NickServ", "VERIFY", vec!["REGISTER", account, token])
             .await
-            .map_err(|e| format!("{e:?}"))
     }
 }
