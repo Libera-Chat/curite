@@ -7,6 +7,16 @@ use crate::config::Config;
 use crate::error::Error;
 use crate::xmlrpc::Xmlrpc;
 
+fn validate(config: &Config, account: &str, token: &str) -> Result<(), Error> {
+    if !config.validation.account.is_match(account) {
+        Err(Error::BadArgument("account"))
+    } else if !config.validation.token.is_match(token) {
+        Err(Error::BadArgument("token"))
+    } else {
+        Ok(())
+    }
+}
+
 pub struct Get {
     config: Config,
     templates: Arc<RwLock<Tera>>,
@@ -21,6 +31,7 @@ impl Get {
     }
 
     pub fn handle(&self, account: &str, token: &str) -> Result<Handled, Error> {
+        validate(&self.config, account, token)?;
         let mut tera_context = Context::new();
         let account_enc = percent_encoding::utf8_percent_encode(account, &ENCODE_CHARS).to_string();
         tera_context.insert("account", &account_enc);
@@ -51,17 +62,7 @@ impl Post {
     }
 
     pub async fn handle(&self, account: &str, token: &str) -> Result<Handled, Error> {
-        self.config
-            .validation
-            .account
-            .find(account)
-            .ok_or(Error::BadArgument("account"))?;
-        self.config
-            .validation
-            .token
-            .find(token)
-            .ok_or(Error::BadArgument("token"))?;
-
+        validate(&self.config, account, token)?;
         let xmlrpc = Xmlrpc::new(self.config.xmlrpc.clone());
         let result = xmlrpc.verify(account, token).await;
 
