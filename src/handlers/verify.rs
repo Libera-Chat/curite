@@ -5,7 +5,7 @@ use tera::{Context, Tera};
 use super::Handled;
 use crate::config::Config;
 use crate::error::Error;
-use crate::xmlrpc::Xmlrpc;
+use crate::xmlrpc::{is_noverify, Xmlrpc};
 
 fn validate(config: &Config, account: &str, token: &str) -> Result<(), Error> {
     if !config.validation.account.is_match(account) {
@@ -70,8 +70,12 @@ impl Post {
             match result {
                 Ok(_) => &self.config.verify.success,
                 Err(e) => {
-                    println!("{e:?}");
-                    &self.config.verify.failure
+                    if is_noverify(&e) {
+                        &self.config.verify.nochange
+                    } else {
+                        println!("{e:?}");
+                        &self.config.verify.failure
+                    }
                 }
             }
             .clone(),

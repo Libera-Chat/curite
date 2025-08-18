@@ -1,6 +1,14 @@
 use dxr_client::{Client, ClientBuilder, ClientError};
 use url::Url;
 
+pub fn is_noverify(error: &ClientError) -> bool {
+    // Magic numbers: 4 is fault_nosuch_target, 12 is fault_nochange
+    match error {
+        ClientError::Fault { fault } => fault.code() == 4 || fault.code() == 12,
+        _ => false,
+    }
+}
+
 pub struct Xmlrpc {
     client: Client,
 }
