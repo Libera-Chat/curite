@@ -10,6 +10,8 @@ pub struct Verify {
     #[serde(with = "http_serde::uri")]
     pub success: Uri,
     #[serde(with = "http_serde::uri")]
+    pub nochange: Uri,
+    #[serde(with = "http_serde::uri")]
     pub failure: Uri,
 }
 

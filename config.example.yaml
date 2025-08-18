@@ -4,6 +4,7 @@ templates: templates/*.html
 
 verify:
   success: https://libera.chat/registration/success
+  nochange: https://libera.chat/registration/nochange
   failure: https://libera.chat/registration/failure
   target: "/curite/verify/{{account}}/{{token}}"
 
