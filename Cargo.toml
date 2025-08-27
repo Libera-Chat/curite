@@ -13,7 +13,7 @@ rust-version = "1.85" # async closures
 
 [dependencies]
 axum = { version = "0.8.4", default-features = false, features = ["http1", "http2", "tokio"] }
-clap = { version = "4.5.9", features = ["derive"] }
+clap = { version = "4.5.46", features = ["derive"] }
 dxr_client = { version = "0.7.0", features = ["reqwest"] }
 http = "1.3.1"
 http-serde = "2.1.1"
