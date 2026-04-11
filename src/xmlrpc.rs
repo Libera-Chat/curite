@@ -26,7 +26,12 @@ impl Xmlrpc {
             .await
     }
 
-    pub async fn verify(&self, ip: &str, account: &str, token: &str) -> Result<String, ClientError> {
+    pub async fn verify(
+        &self,
+        ip: &str,
+        account: &str,
+        token: &str,
+    ) -> Result<String, ClientError> {
         self.request(ip, "NickServ", "VERIFY", vec!["REGISTER", account, token])
             .await
     }
