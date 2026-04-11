@@ -50,7 +50,7 @@ impl Post {
         Self { config }
     }
 
-    pub async fn handle(&self, account: &str, token: &str) -> Result<Handled, Error> {
+    pub async fn handle(&self, account: &str, token: &str, ip: &str) -> Result<Handled, Error> {
         self.config
             .validation
             .account
@@ -63,7 +63,7 @@ impl Post {
             .ok_or(Error::BadArgument("token"))?;
 
         let xmlrpc = Xmlrpc::new(self.config.xmlrpc.clone());
-        let result = xmlrpc.verify(account, token).await;
+        let result = xmlrpc.verify(account, token, ip).await;
 
         Ok(Handled::Redirect(
             match result {

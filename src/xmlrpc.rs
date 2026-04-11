@@ -16,17 +16,18 @@ impl Xmlrpc {
         service: &str,
         command: &str,
         params: Vec<&str>,
+        ip: &str,
     ) -> Result<String, ClientError> {
         self.client
             .call(
                 "atheme.command",
-                [vec!["", "", "127.0.0.1", service, command], params].concat(),
+                [vec!["", "", ip, service, command], params].concat(),
             )
             .await
     }
 
-    pub async fn verify(&self, account: &str, token: &str) -> Result<String, ClientError> {
-        self.request("NickServ", "VERIFY", vec!["REGISTER", account, token])
+    pub async fn verify(&self, account: &str, token: &str, ip: &str) -> Result<String, ClientError> {
+        self.request("NickServ", "VERIFY", vec!["REGISTER", account, token], ip)
             .await
     }
 }

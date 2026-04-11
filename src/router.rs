@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use axum::{
     body::Body,
-    extract::Path,
+    extract::{Path, Request},
     response::{Html, IntoResponse, Redirect, Response},
 };
 use http::StatusCode;
@@ -31,8 +31,14 @@ pub fn init(config: Config, templates: crate::Templates) -> axum::Router {
         .route(
             "/verify/{account}/{token}",
             axum::routing::post(
-                async move |Path((account, token)): Path<(String, String)>| {
-                    display(handler_post.handle(&account, &token).await)
+                async move |Path((account, token)): Path<(String, String)>, request: Request| {
+                    let ip = request
+                        .headers()
+                        .get("x-forwarded-for")
+                        .and_then(|h| h.to_str().ok())
+                        .and_then(|s| s.split(',').next())
+                        .unwrap_or("127.0.0.1");
+                    display(handler_post.handle(&account, &token, ip).await)
                 },
             ),
         )
