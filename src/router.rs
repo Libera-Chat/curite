@@ -38,7 +38,7 @@ pub fn init(config: Config, templates: crate::Templates) -> axum::Router {
                         .and_then(|h| h.to_str().ok())
                         .and_then(|s| s.split(',').next())
                         .unwrap_or("127.0.0.1");
-                    display(handler_post.handle(&account, &token, ip).await)
+                    display(handler_post.handle(ip, &account, &token).await)
                 },
             ),
         )

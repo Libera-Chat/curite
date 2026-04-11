@@ -13,10 +13,10 @@ impl Xmlrpc {
 
     async fn request(
         &self,
+        ip: &str,
         service: &str,
         command: &str,
         params: Vec<&str>,
-        ip: &str,
     ) -> Result<String, ClientError> {
         self.client
             .call(
@@ -26,8 +26,8 @@ impl Xmlrpc {
             .await
     }
 
-    pub async fn verify(&self, account: &str, token: &str, ip: &str) -> Result<String, ClientError> {
-        self.request("NickServ", "VERIFY", vec!["REGISTER", account, token], ip)
+    pub async fn verify(&self, ip: &str, account: &str, token: &str) -> Result<String, ClientError> {
+        self.request(ip, "NickServ", "VERIFY", vec!["REGISTER", account, token])
             .await
     }
 }
