@@ -30,7 +30,7 @@ jobs:
       - name: Copy assets into upload dir
         run: cp --archive --verbose templates/verify.html /tmp/${{ matrix.target }}/release/
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.target }}
           path: |
